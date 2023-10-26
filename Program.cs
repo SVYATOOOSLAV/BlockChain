@@ -19,7 +19,7 @@ namespace BlockChain
             Console.WriteLine(chain.isValidChain());
             Console.WriteLine();
 
-            Block<int> block = chain.getBlock(2);
+            Chain<int>.Block block = chain.getBlock(2);
             block.data = 50;
 
             chain.showAllInfo();

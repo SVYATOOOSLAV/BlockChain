@@ -9,25 +9,63 @@ namespace BlockChain
     
     public class Chain<T>
     {
-        private Block<T> head;
-        private Block<T> last;
+        public class Block
+        {
+            public int currentHash { get; set; }
+            public int previousHash { get; set; }
+            public T data;
+            public DateTime time;
+
+            public Block next;
+
+            public Block(T data, Block previous)
+            {
+                this.data = data;
+                time = DateTime.Now;
+
+                currentHash = previous == null ? GetHashCode() :
+                    GetHashCode(previous.data);
+
+                previousHash = previous == null ? 0 : previous.currentHash;
+            }
+
+
+            public int GetHashCode(T prevData)
+            {
+                int hashCode = -961760943;
+                hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(data);
+                hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(prevData);
+                hashCode = hashCode * -1521134295 + time.GetHashCode();
+                return hashCode;
+            }
+
+            public override int GetHashCode()
+            {
+                int hashCode = -961760943;
+                hashCode = hashCode * -1521134295 + EqualityComparer<T>.Default.GetHashCode(data);
+                hashCode = hashCode * -1521134295 + time.GetHashCode();
+                return hashCode;
+            }
+
+            public override string ToString() => $"Block Date of creation:{time} Data:{data}";
+
+        }
+
+        private Block head;
+        private Block last;
         private int cntBlock = 0;
 
-        public Block<T> getHead()
-        {
-            return head;
-        }
 
         public void addBlock(T data)
         {
             if(head == null)
             {
-                head = new Block<T>(data, null);
+                head = new Block(data, null);
                 last = head;
             }
             else
             {
-                Block<T> newBlock = new Block<T>(data, last);
+                Block newBlock = new Block(data, last);
                 last.next = newBlock;
                 last = newBlock;
             }
@@ -36,8 +74,8 @@ namespace BlockChain
 
         public bool isValidChain()
         {
-            Block<T> block1 = head;
-            Block<T> block2 = head.next;
+            Block block1 = head;
+            Block block2 = head.next;
             while(block2 != null)
             {
                 if (block2.previousHash != block1.currentHash) // check hash
@@ -60,7 +98,7 @@ namespace BlockChain
 
         public void showAllInfo()
         {
-            Block<T> temp = head;
+            Block temp = head;
             while(temp != null)
             {
                 Console.WriteLine(temp);
@@ -68,11 +106,11 @@ namespace BlockChain
             }
         }
 
-        public Block<T> getBlock(int index)
+        public Block getBlock(int index)
         {
             if(index >= 0 && index < cntBlock)
             {
-                Block<T> temp = head;
+                Block temp = head;
                 int currentIndex = 0;
 
                 while (currentIndex != index)
